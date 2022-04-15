@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import { React, useEffect } from 'react';
+import { createClient, Provider } from 'urql';
 
-function App() {
+import PinnedRepos from "./components/PinnedRepos.js";
+import Issues from "./components/Issues.js";
+
+const client = createClient({
+  url: 'https://api.github.com/graphql',
+  fetchOptions: {
+    headers: { authorization: `Bearer ${process.env.REACT_APP_GH_TOKEN}` }
+  }
+});
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider value={client}>
+      <PinnedRepos />
+      <Issues />
+    </Provider>
   );
 }
-
-export default App;
