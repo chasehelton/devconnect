@@ -20,7 +20,6 @@ export default function Issues({username}) {
     }
   `});
   const { data, fetching, error } = result;
-  console.log(data);
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
   return (
@@ -28,11 +27,11 @@ export default function Issues({username}) {
       <h1>Issues</h1>
       <ul>
         {data.user.issues.nodes.map((issue) => (
-            <li key={issue.title}>
-                <p>{issue.title}</p>
-                <p>{issue.body}</p>
-                <p>{issue.closedAt ? `Closed at: ${new Date(issue.closedAt).toLocaleString()}` : "Not closed"}</p>
-            </li>
+          <li key={issue.title}>
+            <p>{issue.title}</p>
+            <p>{issue.body}</p>
+            <p>{issue.closedAt ? `Closed at: ${new Date(issue.closedAt).toLocaleString()}` : "Not closed"}</p>
+          </li>
         ))}
       </ul>
     </div>

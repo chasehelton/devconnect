@@ -1,9 +1,9 @@
-export default function Form({ setUsername }) {
+export default function Form({ setUsernames }) {
     return (
         <div>
             <form onSubmit={(e) => {
                 e.preventDefault();
-                setUsername(e.target.elements.username.value);
+                setUsernames(usernames => [...usernames, e.target.elements.username.value]);
             }}>
                 <label htmlFor="username">Enter a GitHub username: </label>
                 <input type="text" name="username" placeholder="Username" />

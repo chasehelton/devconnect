@@ -5,11 +5,31 @@ export default function Bio({ username }) {
   const [result] = useQuery({ query: `
     query {
       user(login: "${username}") {
+        avatarUrl
         name
         login
         bio
         company
         location
+        email
+        followers(first: 100) {
+          edges {
+            node {
+              url
+              name
+            }
+          }
+          totalCount
+        }
+        following(first: 100){
+          edges{
+            node{
+              url
+              name
+            }
+          }
+          totalCount
+        }
       }
     }
   `});
@@ -18,10 +38,36 @@ export default function Bio({ username }) {
   if (error) return <p>Oh no... {error.message}</p>;
   return (
     <div>
-        <h1>Hey, I'm {data.user.name}</h1>
-        <p>Bio: {data.user.bio}</p>
-        <p>Company: {data.user.company}.</p>
-        <p>Location: {data.user.location}.</p>
+      <img src={data.user.avatarUrl} alt={data.user.name} width="100"/>
+      <h1>Hey, I'm {data.user.name}</h1>
+      <p>Bio: {data.user.bio}</p>
+      <p>Company: {data.user.company}.</p>
+      <p>Location: {data.user.location}.</p>
+      {data.user.email && <p>Email: {data.user.email}.</p>}
+      {data && data.user.followers.edges.filter((user) => user.node.name !== null).length > 0 && (
+        <div>
+          <h2>Followers ({data.user.followers.edges.filter((user) => user.node.name !== null).length})</h2>
+          <ul>
+            {data.user.followers.edges.filter((user) => user.node.name !== null).map((user) => (
+              <li key={user.node.name}>
+                <a href={user.node.url} target="_blank" rel="noreferrer">{user.node.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {data && data.user.following.edges.filter((user) => user.node.name !== null).length > 0 && (
+        <div>
+          <h2>Following ({data.user.following.edges.filter((user) => user.node.name !== null).length})</h2>
+          <ul>
+            {data.user.following.edges.filter((user) => user.node.name !== null).map((user) => (
+              <li key={user.node.name}>
+                <a href={user.node.url} target="_blank" rel="noreferrer">{user.node.name ? user.node.name : ""}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

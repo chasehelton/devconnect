@@ -4,7 +4,7 @@ import { createClient, Provider } from 'urql';
 import Bio from "./components/Bio.js";
 import PinnedRepos from "./components/PinnedRepos.js";
 import Issues from "./components/Issues.js";
-import Form from "./components/Form.js"
+import Form from "./components/Form.js";
 
 const client = createClient({
   url: 'https://api.github.com/graphql',
@@ -14,19 +14,24 @@ const client = createClient({
 });
 
 export default function App() {
-  const [username, setUsername] = useState("");
-  console.log(username);
+  const [usernames, setUsernames] = useState([]);
+
   return (
-    <>
-      {username === "" ? (
-        <Form setUsername={setUsername} />
-      ) : (
-        <Provider value={client}>
-          <Bio username={username} />
-          <PinnedRepos username={username} />
-          <Issues username={username} />
-        </Provider>
-      )}
-    </>
+    <Provider value={client}>
+      <Form setUsernames={setUsernames} />
+      <div style={{display: 'flex', flexDirection: 'row'}}>
+        {usernames.map((username) => (
+          <div key={username}>
+            {/* <button onClick={() => {
+              console.log(username);
+              setUsernames(usernames.filter(item => item.name !== username))
+            }}>X</button> */}
+            <Bio username={username} />
+            <PinnedRepos username={username} />
+            <Issues username={username} />
+          </div>
+        ))}
+      </div>
+    </Provider>
   );
 }

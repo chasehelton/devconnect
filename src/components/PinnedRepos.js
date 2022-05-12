@@ -5,7 +5,7 @@ export default function PinnedRepos({username}) {
   const [result] = useQuery({ query: `
     query {
       user(login: "${username}") {
-        pinnedItems(first: 3) {
+        pinnedItems(first: 10) {
           edges {
             node {
               ... on Repository {
