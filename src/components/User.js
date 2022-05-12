@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "urql";
 import UserHeader from "./UserHeader.js";
 import Bio from "./Bio.js";
 import PinnedRepos from "./PinnedRepos.js";
