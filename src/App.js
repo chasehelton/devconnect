@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { createClient, Provider } from "urql";
+import "./index.css"
 
 import Form from "./components/Form.js";
 import UserList from "./components/UserList.js";

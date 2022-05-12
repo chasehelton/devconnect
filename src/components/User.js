@@ -1,64 +1,86 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "urql";
+import UserHeader from "./UserHeader.js";
 import Bio from "./Bio.js";
 import PinnedRepos from "./PinnedRepos.js";
 import Issues from "./Issues.js";
 
 export default function User({ idx, username, usernames, setUsernames }) {
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [selectedHeader, setSelectedHeader] = useState("Bio");
   const [userScore, setUserScore] = useState(0);
+  const [bioScore, setBioScore] = useState(0);
+  const [repoScore, setRepoScore] = useState(0);
+  const [issueScore, setIssueScore] = useState(0);
+
+  useEffect(() => {
+    if (bioScore > 0 && repoScore > 0 && issueScore > 0) {
+      setUserScore(((bioScore + repoScore + issueScore) / 3) * 100);
+      setInitialLoad(false);
+    }
+  }, [bioScore, repoScore, issueScore]);
+
   return (
     <div
       key={username}
-      style={{
-        width: "400px",
-        backgroundColor: "#eee",
-        padding: "10px",
-        margin: "10px",
-      }}
+      className="w-80 max-w-md p-2 m-2 rounded-lg bg-slate-400"
     >
-      <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", maxHeight: "20px"}}>
-        <p>{username}</p>
+      <UserHeader
+        idx={idx}
+        username={username}
+        usernames={usernames}
+        setUsernames={setUsernames}
+        userScore={userScore}
+      />
+
+      <div className="flex flex-row justify-around">
         <button
-          style={{
-            backgroundColor: "#f00",
-            color: "#fff",
-            paddingLeft: "5px",
-            paddingRight: "5px",
-            border: "none",
-            borderRadius: "5px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            const temp = [...usernames];
-            temp.splice(idx, 1);
-            setUsernames(temp);
-          }}
+          className={`${
+            selectedHeader === "Bio" ? "bg-blue-400" : "bg-blue-200"
+          } w-full`}
+          onClick={() => setSelectedHeader("Bio")}
         >
-          x
+          Bio
+        </button>
+        <button
+          className={`${
+            selectedHeader === "Repos" ? "bg-blue-400" : "bg-blue-200"
+          } w-full`}
+          onClick={() => setSelectedHeader("Repos")}
+        >
+          Repos
+        </button>
+        <button
+          className={`${
+            selectedHeader === "Issues" ? "bg-blue-400" : "bg-blue-200"
+          } w-full`}
+          onClick={() => setSelectedHeader("Issues")}
+        >
+          Issues
         </button>
       </div>
-      <div style={{display: "flex", flexDirection: "row"}}>
-        <p>Score:</p>
-        {userScore < 90 && userScore >= 100 && (
-          <p style={{ fontWeight: "bold", color: "darkgreen" }}>{userScore}%</p>
-        )}
-        {userScore < 90 && userScore >= 75 && (
-          <p style={{ fontWeight: "bold", color: "green" }}>{userScore}%</p>
-        )}
-        {userScore < 75 && userScore >= 50 && (
-          <p style={{ fontWeight: "bold", color: "yellow" }}>{userScore}%</p>
-        )}
-        {userScore < 50 && userScore >= 25 && (
-          <p style={{ fontWeight: "bold", color: "orange" }}>{userScore}%</p>
-        )}
-        {userScore < 25 && userScore >= 0 && (
-          <p style={{ fontWeight: "bold", color: "red" }}>{userScore}%</p>
-        )}
-      </div>
 
-      <Bio username={username} setUserScore={setUserScore} />
-      <PinnedRepos username={username} setUserScore={setUserScore} />
-      <Issues username={username} setUserScore={setUserScore} />
+      {(initialLoad || selectedHeader === "Bio") && (
+        <Bio
+          username={username}
+          bioScore={bioScore}
+          setBioScore={setBioScore}
+        />
+      )}
+      {(initialLoad || selectedHeader === "Repos") && (
+        <PinnedRepos
+          username={username}
+          repoScore={repoScore}
+          setRepoScore={setRepoScore}
+        />
+      )}
+      {(initialLoad || selectedHeader === "Issues") && (
+        <Issues
+          username={username}
+          issueScore={issueScore}
+          setIssueScore={setIssueScore}
+        />
+      )}
     </div>
   );
 }

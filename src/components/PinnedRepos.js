@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useQuery } from "urql";
+import Score from "./Score.js";
 
-export default function PinnedRepos({ username }) {
-  const [showResults, setShowResults] = useState(false);
+export default function PinnedRepos({ username, repoScore, setRepoScore }) {
   const [result] = useQuery({
     query: `
     query {
@@ -26,41 +26,44 @@ export default function PinnedRepos({ username }) {
   `,
   });
   const { data, fetching, error } = result;
+
+  const calculateScore = (data) => {
+    let score = 0;
+    score += data.user.pinnedItems.edges.length > 0 ? 1 : 0;
+    data.user.pinnedItems.edges.forEach((repo) => {
+      score += repo.node.description ? 1 : 0;
+      score += repo.node.name ? 1 : 0;
+      score += repo.node.homepageUrl ? 1 : 0;
+      score += repo.node.url ? 1 : 0;
+    });
+    setRepoScore(score / (1 + data.user.pinnedItems.edges.length * 4));
+  };
+
+  if (data) calculateScore(data);
+
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <h1>
-          Pinned Repos
-          <button
-            style={{ background: "none", border: "none", fontSize: "24px" }}
-            onClick={() => setShowResults(!showResults)}
-          >
-            {showResults ? "-" : "+"}
-          </button>
-        </h1>
-      </div>
-      {showResults && (
-        <ul>
-          {data.user.pinnedItems.edges.map((repo) => (
-            <li key={repo.node.name}>
-              <p>
-                URL: <a href={nodeOrNotFound(repo.node.url)}>Link</a>
-              </p>
-              <p>Name: {nodeOrNotFound(repo.node.name)}</p>
-              <p>Description: {nodeOrNotFound(repo.node.description)}</p>
-              <p>
-                Last Pushed:{" "}
-                {repo.node.pushedAt
-                  ? `${new Date(repo.node.pushedAt).toLocaleString()}`
-                  : "Not found"}
-              </p>
-              <p>Homepage URL: {nodeOrNotFound(repo.node.homepageUrl)}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+      <Score score={repoScore * 100} />
+      <ul>
+        {data.user.pinnedItems.edges.map((repo) => (
+          <li key={repo.node.name}>
+            <p>
+              URL: <a href={nodeOrNotFound(repo.node.url)}>Link</a>
+            </p>
+            <p>Name: {nodeOrNotFound(repo.node.name)}</p>
+            <p>Description: {nodeOrNotFound(repo.node.description)}</p>
+            <p>
+              Last Pushed:{" "}
+              {repo.node.pushedAt
+                ? `${new Date(repo.node.pushedAt).toLocaleString()}`
+                : "Not found"}
+            </p>
+            <p>Homepage URL: {nodeOrNotFound(repo.node.homepageUrl)}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

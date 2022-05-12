@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useQuery } from "urql";
+import Score from "./Score.js";
 
-export default function Bio({ username, setUserScore }) {
-  const [showResults, setShowResults] = useState(false);
+export default function Bio({ username, bioScore, setBioScore }) {
   const [result] = useQuery({
     query: `
     query {
@@ -37,7 +37,6 @@ export default function Bio({ username, setUserScore }) {
   `,
   });
   const { data, fetching, error } = result;
-
   const calculateScore = (data) => {
     let score = 0;
     score += data.user.avatarUrl ? 1 : 0;
@@ -49,25 +48,16 @@ export default function Bio({ username, setUserScore }) {
     score += data.user.email ? 1 : 0;
     score += data.user.followers.totalCount / 10;
     score += data.user.following.totalCount / 10;
-    setUserScore(Math.round((score / 9)  * 100));
-  }
-
+    setBioScore(score / 9);
+  };
   if (data) calculateScore(data);
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
   return (
     <div>
-      <div style={{display: "flex", flexDirection: "row"}}>
-        <h1>
-          Bio
-          <button style={{ background: "none", border: "none", fontSize: "24px"}} onClick={() => setShowResults(!showResults)}>
-            {showResults ? "-" : "+"}
-          </button>
-        </h1>
-      </div>
-      {showResults && (
+      {data && (
         <div>
-          <img src={data.user.avatarUrl} alt={data.user.name} width="100" />
+          <Score score={bioScore * 100} />
           <h1>Hey, I'm {data.user.name}</h1>
           <p>Bio: {data.user.bio}</p>
           <p>Company: {data.user.company}.</p>

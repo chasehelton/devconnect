@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
-import { useQuery } from 'urql';
+import React, { useState } from "react";
+import { useQuery } from "urql";
+import Score from "./Score.js";
 
-export default function Issues({username}) {
-  const [showResults, setShowResults] = useState(false);
-  const [result] = useQuery({ query: `
+export default function Issues({ username, issueScore, setIssueScore }) {
+  const [result] = useQuery({
+    query: `
     query { 
       user(login: "${username}") {
         issues(last: 10, orderBy: {field: CREATED_AT, direction:DESC }){
@@ -11,6 +12,7 @@ export default function Issues({username}) {
             title,
             body,
             closedAt,
+            closed,
             repository{
               name,
               url,
@@ -19,30 +21,36 @@ export default function Issues({username}) {
         }
       }
     }
-  `});
+  `,
+  });
   const { data, fetching, error } = result;
+  const calculateScore = (data) => {
+    let score = 0;
+    data.user.issues.nodes.forEach((issue) => {
+      score += issue.title ? 1 : 0;
+      score += issue.body ? 1 : 0;
+      score += issue.closed ? 1 : 0;
+    });
+    setIssueScore(score / (data.user.issues.nodes.length * 3));
+  };
+  if (data) calculateScore(data);
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
   return (
     <div>
-      <div style={{display: "flex", flexDirection: "row"}}>
-        <h1>
-          Issues
-          <button style={{ background: "none", border: "none", fontSize: "24px"}} onClick={() => setShowResults(!showResults)}>
-            {showResults ? "-" : "+"}
-          </button>
-        </h1>
-      </div>
-      {showResults && (<ul>
+      <Score score={issueScore * 100} />
+      <ul>
         {data.user.issues.nodes.map((issue) => (
           <li key={issue.title}>
             <p>{issue.title}</p>
-            {/* <p>{issue.body}</p> */}
-            <p>{issue.closedAt ? `Closed at: ${new Date(issue.closedAt).toLocaleString()}` : "Not closed"}</p>
+            <p>
+              {issue.closedAt
+                ? `Closed at: ${new Date(issue.closedAt).toLocaleString()}`
+                : "Not closed"}
+            </p>
           </li>
         ))}
       </ul>
-      )}
     </div>
   );
 }
