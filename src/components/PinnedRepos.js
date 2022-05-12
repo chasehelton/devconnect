@@ -1,14 +1,15 @@
 import React from 'react';
 import { useQuery } from 'urql';
 
-export default function PinnedRepos() {
-  const PinnedReposQuery = `
-    query PinnedRepos {
-      user(login: "chasehelton") {
+export default function PinnedRepos({username}) {
+  const [result] = useQuery({ query: `
+    query {
+      user(login: "${username}") {
         pinnedItems(first: 3) {
           edges {
             node {
               ... on Repository {
+                id
                 name
                 description
                 pushedAt
@@ -20,10 +21,7 @@ export default function PinnedRepos() {
         }
       }
     }
-  `;
-  const [result, reexecuteQuery] = useQuery({
-    query: PinnedReposQuery,
-  });
+  `});
   const { data, fetching, error } = result;
   if (fetching) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
@@ -33,13 +31,16 @@ export default function PinnedRepos() {
       <ul>
         {data.user.pinnedItems.edges.map((repo) => (
           <li key={repo.node.name}>
-            <a href={repo.node.url}>{repo.node.name}</a>
-            <p>{repo.node.description}</p>
-            <p>{repo.node.pushedAt}</p>
-            <p>{repo.node.homepageUrl}</p>
+            <p>URL: <a href={nodeOrNotFound(repo.node.url)}>Link</a></p>
+            <p>Name: {nodeOrNotFound(repo.node.name)}</p>
+            <p>Description: {nodeOrNotFound(repo.node.description)}</p>
+            <p>Last Pushed: {repo.node.pushedAt ? `${new Date(repo.node.pushedAt).toLocaleString()}` : "Not found"}</p>
+            <p>Homepage URL: {nodeOrNotFound(repo.node.homepageUrl)}</p>
           </li>
         ))}
       </ul>
     </div>
   );
 }
+
+const nodeOrNotFound = (node) => (node ? node : "Not found");
