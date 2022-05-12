@@ -1,16 +1,14 @@
-import { React, useState, useEffect } from 'react';
-import { createClient, Provider } from 'urql';
+import { React, useState, useEffect } from "react";
+import { createClient, Provider } from "urql";
 
-import Bio from "./components/Bio.js";
-import PinnedRepos from "./components/PinnedRepos.js";
-import Issues from "./components/Issues.js";
 import Form from "./components/Form.js";
+import UserList from "./components/UserList.js";
 
 const client = createClient({
-  url: 'https://api.github.com/graphql',
+  url: "https://api.github.com/graphql",
   fetchOptions: {
-    headers: { authorization: `Bearer ${process.env.REACT_APP_GH_TOKEN}` }
-  }
+    headers: { authorization: `Bearer ${process.env.REACT_APP_GH_TOKEN}` },
+  },
 });
 
 export default function App() {
@@ -18,20 +16,16 @@ export default function App() {
 
   return (
     <Provider value={client}>
-      <Form setUsernames={setUsernames} />
-      <div style={{display: 'flex', flexDirection: 'row'}}>
-        {usernames.map((username) => (
-          <div key={username}>
-            {/* <button onClick={() => {
-              console.log(username);
-              setUsernames(usernames.filter(item => item.name !== username))
-            }}>X</button> */}
-            <Bio username={username} />
-            <PinnedRepos username={username} />
-            <Issues username={username} />
-          </div>
-        ))}
-      </div>
+      {usernames.length < 4 && (
+        <div>
+          <p>Add up to 4 GitHub users</p>
+          <Form setUsernames={setUsernames} />
+        </div>
+      )}
+      {usernames.length === 4 && (
+        <p>Maximum users reached. Please remove a user to add a new one.</p>
+      )}
+      <UserList usernames={usernames} setUsernames={setUsernames} />
     </Provider>
   );
 }
