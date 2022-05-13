@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import { createClient, Provider } from "urql";
-import "./index.css"
+import "./index.css";
 
 import Form from "./components/Form.js";
 import UserList from "./components/UserList.js";
@@ -17,15 +17,7 @@ export default function App() {
 
   return (
     <Provider value={client}>
-      {usernames.length < 4 && (
-        <div>
-          <p>Add up to 4 GitHub users</p>
-          <Form setUsernames={setUsernames} />
-        </div>
-      )}
-      {usernames.length === 4 && (
-        <p>Maximum users reached. Please remove a user to add a new one.</p>
-      )}
+      <Form setUsernames={setUsernames} />
       <UserList usernames={usernames} setUsernames={setUsernames} />
     </Provider>
   );

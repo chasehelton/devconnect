@@ -26,44 +26,40 @@ export default function PinnedRepos({ username, repoScore, setRepoScore }) {
   `,
   });
   const { data, fetching, error } = result;
-
-  const calculateScore = (data) => {
-    let score = 0;
-    score += data.user.pinnedItems.edges.length > 0 ? 1 : 0;
-    data.user.pinnedItems.edges.forEach((repo) => {
-      score += repo.node.description ? 1 : 0;
-      score += repo.node.name ? 1 : 0;
-      score += repo.node.homepageUrl ? 1 : 0;
-      score += repo.node.url ? 1 : 0;
-    });
-    setRepoScore(score / (1 + data.user.pinnedItems.edges.length * 4));
-  };
-
-  if (data) calculateScore(data);
-
+  // const calculateScore = (data) => {
+  //   let score = 0;
+  //   score += data.user.pinnedItems.edges.length > 0 ? 1 : 0;
+  //   data.user.pinnedItems.edges.forEach((repo) => {
+  //     score += repo.node.description ? 1 : 0;
+  //     score += repo.node.name ? 1 : 0;
+  //     score += repo.node.homepageUrl ? 1 : 0;
+  //     score += repo.node.url ? 1 : 0;
+  //   });
+  //   setRepoScore(score / (1 + data.user.pinnedItems.edges.length * 4));
+  // };
+  // if (data) calculateScore(data);
+  if (error) {
+    return null;
+  }
   if (fetching) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
+  
   return (
     <div>
-      <Score score={repoScore * 100} />
-      <ul>
-        {data.user.pinnedItems.edges.map((repo) => (
-          <li key={repo.node.name}>
-            <p>
-              URL: <a href={nodeOrNotFound(repo.node.url)}>Link</a>
-            </p>
-            <p>Name: {nodeOrNotFound(repo.node.name)}</p>
-            <p>Description: {nodeOrNotFound(repo.node.description)}</p>
-            <p>
-              Last Pushed:{" "}
-              {repo.node.pushedAt
-                ? `${new Date(repo.node.pushedAt).toLocaleString()}`
-                : "Not found"}
-            </p>
-            <p>Homepage URL: {nodeOrNotFound(repo.node.homepageUrl)}</p>
-          </li>
-        ))}
-      </ul>
+      {data && (
+        <div>
+          {/* <Score score={repoScore * 100} />
+          {repoScore === 0 && <p>No pinned repos found.</p>} */}
+          {data.user.pinnedItems.edges.length === 0 && <p>User has no pinned repos.</p>}
+          <ul>
+            {data.user.pinnedItems.edges.map((repo) => (
+              <li className="p-2" key={repo.node.name}>
+                <a className="font-bold text-blue-600" href={nodeOrNotFound(repo.node.url)}>{repo.node.name}</a>
+                <p>{nodeOrNotFound(repo.node.description)}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

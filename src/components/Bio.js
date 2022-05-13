@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "urql";
 import Score from "./Score.js";
 
-export default function Bio({ username, bioScore, setBioScore }) {
+export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
+  // const [connections, setConnections] = useState([]);
   const [result] = useQuery({
     query: `
     query {
@@ -19,6 +20,7 @@ export default function Bio({ username, bioScore, setBioScore }) {
             node {
               url
               name
+              login
             }
           }
           totalCount
@@ -28,6 +30,7 @@ export default function Bio({ username, bioScore, setBioScore }) {
             node{
               url
               name
+              login
             }
           }
           totalCount
@@ -37,92 +40,105 @@ export default function Bio({ username, bioScore, setBioScore }) {
   `,
   });
   const { data, fetching, error } = result;
-  const calculateScore = (data) => {
-    let score = 0;
-    score += data.user.avatarUrl ? 1 : 0;
-    score += data.user.name ? 1 : 0;
-    score += data.user.login ? 1 : 0;
-    score += data.user.bio ? 1 : 0;
-    score += data.user.company ? 1 : 0;
-    score += data.user.location ? 1 : 0;
-    score += data.user.email ? 1 : 0;
-    score += data.user.followers.totalCount / 10;
-    score += data.user.following.totalCount / 10;
-    setBioScore(score / 9);
-  };
-  if (data) calculateScore(data);
+  // const calculateScore = (data) => {
+  //   let score = 0;
+  //   score += data.user.avatarUrl ? 1 : 0;
+  //   score += data.user.name ? 1 : 0;
+  //   score += data.user.login ? 1 : 0;
+  //   score += data.user.bio ? 1 : 0;
+  //   score += data.user.company ? 1 : 0;
+  //   score += data.user.location ? 1 : 0;
+  //   score += data.user.email ? 1 : 0;
+  //   score += data.user.followers.totalCount / 10;
+  //   score += data.user.following.totalCount / 10;
+  //   setBioScore(score / 9);
+  // };
+  // if (data) calculateScore(data);
+  if (error) {
+    alert(error.message);
+    return null;
+  }
   if (fetching) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
+
+  let connections = [];
+
+  if (data) {
+    if (data.user.followers.totalCount > 0) {
+      let followers = data.user.followers.edges.filter(
+        (user) => user.node.name !== null
+      );
+      followers.forEach((follower) => connections.push(follower.node));
+    }
+    if (data.user.following.totalCount > 0) {
+      let following = data.user.following.edges.filter(
+        (user) => user.node.name !== null
+      );
+      following.forEach((following) => {
+        if (
+          !connections.some(
+            (connection) => connection.login === following.node.login
+          )
+        ) {
+          connections.push(following.node);
+        }
+      });
+    }
+  }
   return (
     <div>
       {data && (
         <div>
-          <Score score={bioScore * 100} />
-          <h1>Hey, I'm {data.user.name}</h1>
-          <p>Bio: {data.user.bio}</p>
-          <p>Company: {data.user.company}.</p>
-          <p>Location: {data.user.location}.</p>
-          {data.user.email && <p>Email: {data.user.email}.</p>}
-          {data &&
-            data.user.followers.edges.filter((user) => user.node.name !== null)
-              .length > 0 && (
-              <div>
-                <h2>
-                  Followers (
-                  {
-                    data.user.followers.edges.filter(
-                      (user) => user.node.name !== null
-                    ).length
-                  }
-                  )
-                </h2>
-                <ul>
-                  {data.user.followers.edges
-                    .filter((user) => user.node.name !== null)
-                    .map((user) => (
-                      <li key={user.node.name}>
-                        <a
-                          href={user.node.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {user.node.name}
-                        </a>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )}
-          {data &&
-            data.user.following.edges.filter((user) => user.node.name !== null)
-              .length > 0 && (
-              <div>
-                <h2>
-                  Following (
-                  {
-                    data.user.following.edges.filter(
-                      (user) => user.node.name !== null
-                    ).length
-                  }
-                  )
-                </h2>
-                <ul>
-                  {data.user.following.edges
-                    .filter((user) => user.node.name !== null)
-                    .map((user) => (
-                      <li key={user.node.name}>
-                        <a
-                          href={user.node.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {user.node.name ? user.node.name : ""}
-                        </a>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )}
+          {/* <Score score={bioScore * 100} /> */}
+          {data.user.bio && (
+            <div className="my-3">
+              <p className="font-bold">Bio</p>
+              <p>{data.user.bio}</p>
+            </div>
+          )}
+          {(data.user.company || data.user.location || data.user.email) && (
+            <div className="my-3">
+              <p className="font-bold">User Info</p>
+              <ul>
+                {data.user.company && (
+                  <li>
+                    <p>Company - {data.user.company}</p>
+                  </li>
+                )}
+                {data.user.location && (
+                  <li>
+                    <p>Location - {data.user.location}</p>
+                  </li>
+                )}
+                {data.user.email && (
+                  <li>
+                    <p>Email - {data.user.email}.</p>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+          {connections.length > 0 && (
+            <div className="my-3">
+              <p className="font-bold">Connections (click to compare)</p>
+              <ul>
+                {connections.map((connection) => (
+                  <li className="" key={connection.login}>
+                    <button
+                      className="text-blue-500"
+                      onClick={() =>
+                        setUsernames((usernames) => [
+                          ...usernames,
+                          connection.login,
+                        ])
+                      }
+                    >
+                      {connection.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

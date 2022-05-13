@@ -14,44 +14,53 @@ export default function UserHeader({
           user(login: "${username}") {
             avatarUrl
             login
+            email
+            name
+            url
           }
         }
       `,
   });
   const { data, fetching, error } = result;
-
+  if (error) {
+    alert(error.message);
+    return null;
+  }
   if (fetching) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
+  
   return (
-    <div>
-      <button
-        className="bg-slate-300 hover:bg-slate-400 text-white font-bold py-1 px-2 rounded"
-        onClick={() => {
-          const temp = [...usernames];
-          temp.splice(idx, 1);
-          setUsernames(temp);
-        }}
-      >
-        x
-      </button>
-      <div className="flex flex-row items-center my-3">
-        <img
-          className="rounded-full mx-2"
-          src={data.user.avatarUrl}
-          alt={data.user.name}
-          width="50"
-        />
-        <div className="flex flex-col">
-          <p className="font-bold">{data.user.login}</p>
-          <Score score={userScore} />
+    <>
+      {data && (
+        <div className="flex flex-row justify-between">
+          <a href={data.user.url} target="_blank" rel="noreferrer">
+            <div className="flex flex-row items-center justify-between">
+              <div className="flex flex-row my-2">
+                <img
+                  className="rounded-full mx-2"
+                  src={data.user.avatarUrl}
+                  alt={data.user.name}
+                  width="50"
+                />
+                <div className="flex flex-col">
+                  <a href={data.user.url} target="_blank" rel="noreferrer"><p className="font-bold text-blue-500">{data.user.login}</p></a>
+                  <p>{data.user.name}</p>
+                  {/* <Score score={userScore} /> */}
+                </div>
+              </div>
+            </div>
+          </a>
+          <button
+            className="text-text-slate-500 hover:text-slate-300 h-8 font-bold text-xs rounded"
+            onClick={() => {
+              const temp = [...usernames];
+              temp.splice(idx, 1);
+              setUsernames(temp);
+            }}
+          >
+            Remove
+          </button>
         </div>
-        {/* <p className="font-bold">{data.user.login}</p>
-        <Score score={userScore} /> */}
-        {/* <div className="flex flex-col justify-center self-end">
-          {/* <p>Total Score:</p>
-          
-        </div> */}
-      </div>
-    </div>
+      )}
+    </>
   );
 }
