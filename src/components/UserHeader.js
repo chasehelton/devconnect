@@ -1,5 +1,5 @@
 import { useQuery } from "urql";
-import Score from "./Score.js";
+import { MailIcon, XIcon } from '@heroicons/react/solid';
 
 export default function UserHeader({
   idx,
@@ -7,6 +7,8 @@ export default function UserHeader({
   usernames,
   setUsernames,
   userScore,
+  selectedHeader,
+  setSelectedHeader,
 }) {
   const [result] = useQuery({
     query: `
@@ -27,38 +29,69 @@ export default function UserHeader({
     return null;
   }
   if (fetching) return <p>Loading...</p>;
-  
+
   return (
     <>
       {data && (
-        <div className="flex flex-row justify-between">
-          <a href={data.user.url} target="_blank" rel="noreferrer">
+        <div>
+          <div className="flex flex-row justify-between">
             <div className="flex flex-row items-center justify-between">
               <div className="flex flex-row my-2">
-                <img
-                  className="rounded-full mx-2"
-                  src={data.user.avatarUrl}
-                  alt={data.user.name}
-                  width="50"
-                />
+                <a href={data.user.url} target="_blank" rel="noreferrer">
+                  <img
+                    className="rounded-full mx-2"
+                    src={data.user.avatarUrl}
+                    alt={data.user.name}
+                    width="50"
+                  />
+                </a>
                 <div className="flex flex-col">
-                  <a href={data.user.url} target="_blank" rel="noreferrer"><p className="font-bold text-blue-500">{data.user.login}</p></a>
+                  <a href={data.user.url} target="_blank" rel="noreferrer">
+                    <p className="font-bold text-blue-500 hover:text-blue-300">{data.user.login}</p>
+                  </a>
                   <p>{data.user.name}</p>
-                  {/* <Score score={userScore} /> */}
                 </div>
               </div>
             </div>
-          </a>
-          <button
-            className="text-text-slate-500 hover:text-slate-300 h-8 font-bold text-xs rounded"
-            onClick={() => {
-              const temp = [...usernames];
-              temp.splice(idx, 1);
-              setUsernames(temp);
-            }}
-          >
-            Remove
-          </button>
+            <div>
+              {data.user.email && <button
+                onClick={() => window.location = "mailto:" + data.user.email}
+              >
+                <MailIcon className="w-8 text-slate-800 hover:text-slate-300" />
+              </button>}
+              <button
+                onClick={() => {
+                  const temp = [...usernames];
+                  temp.splice(idx, 1);
+                  setUsernames(temp);
+                }}
+              >
+                <XIcon className="w-8 text-slate-800 hover:text-slate-300" />
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-row justify-around">
+            <button
+              className={`${
+                selectedHeader === "Social"
+                  ? "bg-slate-600 text-white"
+                  : "bg-slate-200"
+              } w-full`}
+              onClick={() => setSelectedHeader("Social")}
+            >
+              Social
+            </button>
+            <button
+              className={`${
+                selectedHeader === "Code"
+                  ? "bg-slate-600 text-white"
+                  : "bg-slate-200"
+              } w-full`}
+              onClick={() => setSelectedHeader("Code")}
+            >
+              Code
+            </button>
+          </div>
         </div>
       )}
     </>

@@ -2,7 +2,7 @@ import { React, useState } from "react";
 import { createClient, Provider } from "urql";
 import "./index.css";
 
-import Form from "./components/Form.js";
+import TopBar from "./components/TopBar.js";
 import UserList from "./components/UserList.js";
 
 const client = createClient({
@@ -14,11 +14,13 @@ const client = createClient({
 
 export default function App() {
   const [usernames, setUsernames] = useState([]);
+  const [maxUsersReached, setMaxUsersReached] = useState(false);
+  const [userAlreadyAdded, setUserAlreadyAdded] = useState(false);
 
   return (
     <Provider value={client}>
-      <Form setUsernames={setUsernames} />
-      <UserList usernames={usernames} setUsernames={setUsernames} />
+      <TopBar usernames={usernames} setUsernames={setUsernames} maxUsersReached={maxUsersReached} userAlreadyAdded={userAlreadyAdded} setUserAlreadyAdded={setUserAlreadyAdded} />
+      <UserList usernames={usernames} setUsernames={setUsernames} setMaxUsersReached={setMaxUsersReached} setUserAlreadyAdded={setUserAlreadyAdded} />
     </Provider>
   );
 }

@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "urql";
-import Score from "./Score.js";
 
-export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
-  // const [connections, setConnections] = useState([]);
+export default function Social({
+  username,
+  usernames,
+  setUsernames,
+  setMaxUsersReached,
+  setUserAlreadyAdded,
+}) {
   const [result] = useQuery({
     query: `
     query {
@@ -15,6 +19,7 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
         company
         location
         email
+        websiteUrl
         followers(first: 10) {
           edges {
             node {
@@ -40,20 +45,7 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
   `,
   });
   const { data, fetching, error } = result;
-  // const calculateScore = (data) => {
-  //   let score = 0;
-  //   score += data.user.avatarUrl ? 1 : 0;
-  //   score += data.user.name ? 1 : 0;
-  //   score += data.user.login ? 1 : 0;
-  //   score += data.user.bio ? 1 : 0;
-  //   score += data.user.company ? 1 : 0;
-  //   score += data.user.location ? 1 : 0;
-  //   score += data.user.email ? 1 : 0;
-  //   score += data.user.followers.totalCount / 10;
-  //   score += data.user.following.totalCount / 10;
-  //   setBioScore(score / 9);
-  // };
-  // if (data) calculateScore(data);
+
   if (error) {
     alert(error.message);
     return null;
@@ -63,6 +55,7 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
   let connections = [];
 
   if (data) {
+    console.log(data.user.websiteUrl);
     if (data.user.followers.totalCount > 0) {
       let followers = data.user.followers.edges.filter(
         (user) => user.node.name !== null
@@ -88,11 +81,10 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
     <div>
       {data && (
         <div>
-          {/* <Score score={bioScore * 100} /> */}
           {data.user.bio && (
             <div className="my-3">
               <p className="font-bold">Bio</p>
-              <p>{data.user.bio}</p>
+              <p className="pl-2">{data.user.bio}</p>
             </div>
           )}
           {(data.user.company || data.user.location || data.user.email) && (
@@ -100,18 +92,31 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
               <p className="font-bold">User Info</p>
               <ul>
                 {data.user.company && (
-                  <li>
+                  <li className="pl-2">
                     <p>Company - {data.user.company}</p>
                   </li>
                 )}
                 {data.user.location && (
-                  <li>
+                  <li className="pl-2">
                     <p>Location - {data.user.location}</p>
                   </li>
                 )}
                 {data.user.email && (
-                  <li>
+                  <li className="pl-2">
                     <p>Email - {data.user.email}.</p>
+                  </li>
+                )}
+                {data.user.websiteUrl && (
+                  <li className="pl-2">
+                    <a
+                      href={`https://${data.user.websiteUrl}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <p className="font-bold text-blue-500 hover:text-blue-300">
+                        {data.user.websiteUrl}
+                      </p>
+                    </a>
                   </li>
                 )}
               </ul>
@@ -122,17 +127,30 @@ export default function Bio({ username, setUsernames, bioScore, setBioScore }) {
               <p className="font-bold">Connections (click to compare)</p>
               <ul>
                 {connections.map((connection) => (
-                  <li className="" key={connection.login}>
+                  <li className="pl-2" key={connection.login}>
                     <button
-                      className="text-blue-500"
-                      onClick={() =>
-                        setUsernames((usernames) => [
-                          ...usernames,
-                          connection.login,
-                        ])
+                      className={
+                        usernames.includes(connection.login)
+                          ? `font-bold text-blue-600`
+                          : `text-blue-500`
                       }
+                      onClick={() => {
+                        if (usernames.length === 8) setMaxUsersReached(true);
+                        else if (usernames.includes(connection.login))
+                          setUserAlreadyAdded(true);
+                        else {
+                          setUsernames((usernames) => [
+                            ...usernames,
+                            connection.login,
+                          ]);
+                        }
+                        setTimeout(() => {
+                          setUserAlreadyAdded(false);
+                          setMaxUsersReached(false);
+                        }, 2000);
+                      }}
                     >
-                      {connection.name}
+                      {connection.name} ({connection.login})
                     </button>
                   </li>
                 ))}
