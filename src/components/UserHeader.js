@@ -1,5 +1,6 @@
 import { useQuery } from "urql";
 import { MailIcon, XIcon } from '@heroicons/react/solid';
+import { useAuth } from "../contexts/AuthProvider.js";
 
 export default function UserHeader({
   idx,
@@ -10,6 +11,7 @@ export default function UserHeader({
   selectedHeader,
   setSelectedHeader,
 }) {
+  const { user } = useAuth();
   const [result] = useQuery({
     query: `
         query {

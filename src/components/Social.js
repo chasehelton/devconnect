@@ -55,7 +55,6 @@ export default function Social({
   let connections = [];
 
   if (data) {
-    console.log(data.user.websiteUrl);
     if (data.user.followers.totalCount > 0) {
       let followers = data.user.followers.edges.filter(
         (user) => user.node.name !== null
