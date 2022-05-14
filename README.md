@@ -6,6 +6,8 @@
 
 ```
 REACT_APP_GH_TOKEN="YOUR_TOKEN_HERE"
+REACT_APP_SUPABASE_API_KEY="YOUR_API_KEY_HERE"
+REACT_APP_SUPABASE_URL="YOUR_URL_HERE"
 ```
 
 _Follow the steps [here](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to generate your own token._
