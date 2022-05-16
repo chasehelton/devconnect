@@ -15,21 +15,35 @@ export default function Home({ page }) {
   const [usernames, setUsernames] = useState([]);
   const [maxUsersReached, setMaxUsersReached] = useState(false);
   const [userAlreadyAdded, setUserAlreadyAdded] = useState(false);
+  const [userNotFound, setUserNotFound] = useState(false);
   const [userAdded, setUserAdded] = useState(false);
 
   const addUserToList = (username) => {
-    if (usernames.length === 8) {
-      setMaxUsersReached(true);
-      setTimeout(() => setMaxUsersReached(false), 2000);
-    } else if (usernames.includes(username)) {
-      setUserAlreadyAdded(true);
-      setTimeout(() => setUserAlreadyAdded(false), 2000);
-    } else {
-      setUserAdded(true);
-      if (!usernames.includes(username))
-        setUsernames((usernames) => [...usernames, username]);
-      setTimeout(() => setUserAdded(false), 2000);
-    }
+    fetch(`https://api.github.com/users/${username}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === "Not Found" || (data.followers === 0 && data.following === 0)) {
+          setUserNotFound(true);
+          setTimeout(() => {
+            setUserNotFound(false);
+          }, 2000);
+        }
+        else {
+          if (usernames.length === 8) {
+            setMaxUsersReached(true);
+            setTimeout(() => setMaxUsersReached(false), 2000);
+          } else if (usernames.includes(username)) {
+            setUserAlreadyAdded(true);
+            setTimeout(() => setUserAlreadyAdded(false), 2000);
+          } else {
+            setUserAdded(true);
+            if (!usernames.includes(username))
+              setUsernames((usernames) => [...usernames, username]);
+            setTimeout(() => setUserAdded(false), 2000);
+          }
+        }
+      })
+    
   };
 
   return (
@@ -40,6 +54,8 @@ export default function Home({ page }) {
         setUsernames={setUsernames}
         maxUsersReached={maxUsersReached}
         setMaxUsersReached={setMaxUsersReached}
+        userNotFound={userNotFound}
+        setUserNotFound={setUserNotFound}
         userAlreadyAdded={userAlreadyAdded}
         setUserAlreadyAdded={setUserAlreadyAdded}
         addUserToList={addUserToList}
@@ -54,6 +70,7 @@ export default function Home({ page }) {
             setMaxUsersReached={setMaxUsersReached}
             setUserAlreadyAdded={setUserAlreadyAdded}
             addUserToList={addUserToList}
+            userNotFound={userNotFound}
           />
         )}
         {page === "Messages" && <Messages />}

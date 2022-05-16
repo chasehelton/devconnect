@@ -1,29 +1,11 @@
 import { useQuery } from "urql";
+import { GET_LANGUAGES } from "../graphql/queries";
 
 export default function Languages({ username }) {
+  const variables = { username: username };
   const [result] = useQuery({
-    query: `
-        query {
-            user(login: "${username}") {
-              repositories(first: 100) {
-                edges {
-                  node {
-                    ... on Repository {
-                      name
-                      languages(first: 10) {
-                        edges {
-                          node {
-                            name
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-        }
-        `,
+    query: GET_LANGUAGES,
+    variables,
   });
   const { data, fetching, error } = result;
 
@@ -48,10 +30,10 @@ export default function Languages({ username }) {
       }
     });
     for (let language in languageMap) {
-        topLanguages.push({
-            name: language,
-            count: languageMap[language]
-        });
+      topLanguages.push({
+        name: language,
+        count: languageMap[language],
+      });
     }
     topLanguages.sort((a, b) => b.count - a.count);
   }
@@ -62,27 +44,33 @@ export default function Languages({ username }) {
         <div className="my-3">
           <p className="font-bold">Top Languages (by frequency)</p>
           <div className="flex flex-row justify-around">
-          <ul>
-            {topLanguages.slice(0, 3).map((language, idx) => (
+            <ul>
+              {topLanguages.slice(0, 3).map((language, idx) => (
                 <li key={language.name}>
-                    <p className="">{idx + 1}. {language.name}</p>
+                  <p className="">
+                    {idx + 1}. {language.name}
+                  </p>
                 </li>
-            ))}
-          </ul>
-          <ul>
-            {topLanguages.slice(3, 6).map((language, idx) => (
+              ))}
+            </ul>
+            <ul>
+              {topLanguages.slice(3, 6).map((language, idx) => (
                 <li key={language.name}>
-                    <p className="">{idx + 4}. {language.name}</p>
+                  <p className="">
+                    {idx + 4}. {language.name}
+                  </p>
                 </li>
-            ))}
-          </ul>
-          <ul>
-            {topLanguages.slice(6, 9).map((language, idx) => (
+              ))}
+            </ul>
+            <ul>
+              {topLanguages.slice(6, 9).map((language, idx) => (
                 <li key={language.name}>
-                    <p className="">{idx + 7}. {language.name}</p>
+                  <p className="">
+                    {idx + 7}. {language.name}
+                  </p>
                 </li>
-            ))}
-          </ul>
+              ))}
+            </ul>
           </div>
         </div>
       )}

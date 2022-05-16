@@ -6,6 +6,7 @@ export default function UserList({
   setMaxUsersReached,
   setUserAlreadyAdded,
   addUserToList,
+  userNotFound,
 }) {
   document.title = "devconnect | Home";
   const { user } = useAuth();

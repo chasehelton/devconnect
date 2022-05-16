@@ -38,7 +38,7 @@ export default function Auth({
   };
 
   return (
-    <div className="fixed right-0 top-24 sm:top-16">
+    <div className="fixed right-1 top-20 sm:top-16">
       <div className="bg-slate-100 shadow-lg rounded-md p-2">
         <div className={user ? 'flex justify-center text-center w-48' : 'flex justify-center text-center w-48'}>
           {!user && (

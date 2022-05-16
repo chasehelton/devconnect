@@ -19,6 +19,8 @@ export default function TopBar({
   setUsernames,
   maxUsersReached,
   setMaxUsersReached,
+  userNotFound,
+  setUserNotFound,
   userAlreadyAdded,
   setUserAlreadyAdded,
   userAdded,
@@ -26,7 +28,6 @@ export default function TopBar({
   addUserToList
 }) {
   const [error, setError] = useState(false);
-  const [userNotFound, setUserNotFound] = useState(false);
   const [showingAuthModal, setShowingAuthModal] = useState(false);
   const [showingFavoritesModal, setShowingFavoritesModal] = useState(false);
   const [showingInfo, setShowingInfo] = useState(false);
