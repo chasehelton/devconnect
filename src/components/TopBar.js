@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
+  ChatIcon,
   InformationCircleIcon,
   PlusIcon,
   UserCircleIcon,
+  StarIcon,
 } from "@heroicons/react/solid";
 import Auth from "./Auth.js";
-import Notification from "./Notification.js";
+import Notifications from "./Notifications.js";
 import { useAuth } from "../contexts/AuthProvider.js";
 
 export default function TopBar({
+  page,
   usernames,
   setUsernames,
   maxUsersReached,
@@ -22,22 +26,19 @@ export default function TopBar({
   const [showingInfo, setShowingInfo] = useState(false);
   const [showingForm, setShowingForm] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setShowingForm(user && usernames.length < 8 && usernames.length >= 0)
+    setShowingForm(user && usernames.length < 8 && usernames.length >= 0);
   }, [user, usernames]);
-
-  // useEffect(() => {
-  //   if (usernames.length >= 8) setShowingForm(false);
-  //   else setShowingForm(true);
-  // }, [usernames]);
 
   const addUserToList = (username) => {
     if (usernames.includes(username)) {
       setUserAlreadyAdded(true);
     } else {
       setUserAdded(true);
-      if (!usernames.includes(username)) setUsernames((usernames) => [...usernames, username]);
+      if (!usernames.includes(username))
+        setUsernames((usernames) => [...usernames, username]);
       setTimeout(() => setUserAdded(false), 2000);
     }
   };
@@ -49,10 +50,15 @@ export default function TopBar({
   };
 
   return (
-    <>
+    <div>
       <div className="w-full fixed top-0 p-0 sm:p-4 bg-slate-50 drop-shadow-lg flex flex-col sm:flex-row justify-between items-center">
         <div className="flex flex-row items-center">
-          <h3 className="font-bold text-2xl my-2 sm:my-0">Dev-Compare</h3>
+          <button
+            className="flex items-center focus:outline-none"
+            onClick={() => navigate("/")}
+          >
+            <h3 className="font-bold text-2xl my-2 sm:my-0">devconnect</h3>
+          </button>
           <button
             className="flex bg-justify-center bg-slate-50 rounded-md items-center"
             onClick={() => {
@@ -63,9 +69,9 @@ export default function TopBar({
           </button>
         </div>
         <div className="flex flex-row mx-2 items-center">
-          {showingForm && (
+          {showingForm && page === "UserList" && (
             <form
-              className="flex flex-row mx-2 items-center"
+              className="flex flex-row items-center"
               onSubmit={(e) => {
                 e.preventDefault();
                 setShowingInfo(false);
@@ -92,6 +98,12 @@ export default function TopBar({
                   });
               }}
             >
+              <button
+                className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+                type="submit"
+              >
+                <PlusIcon className="w-8 text-slate-800 hover:text-slate-400" />
+              </button>
               <input
                 className="w-48 h-8 sm:w-64 mx-2 p-1 rounded-md border-2"
                 type="text"
@@ -99,12 +111,6 @@ export default function TopBar({
                 required
                 placeholder="GitHub Username"
               />
-              <button
-                className="flex justify-center border-2 w-8 h-8 p-1 my-2 bg-slate-200 rounded-md items-center"
-                type="submit"
-              >
-                <PlusIcon className="w-8 text-slate-800 hover:text-slate-400" />
-              </button>
             </form>
           )}
           {!showingForm && user && (
@@ -113,16 +119,39 @@ export default function TopBar({
             </p>
           )}
           {!showingForm && !user && (
-            <p className="italic mr-2">
-              Please sign into GitHub.
-            </p>
+            <p className="italic mr-2">Please sign into GitHub.</p>
+          )}
+          {showingForm && user && (
+            <button
+              className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+              onClick={() =>
+                navigate(
+                  `/${user.identities[0].identity_data.user_name}/messages`
+                )
+              }
+            >
+              <ChatIcon className="w-8 text-slate-800 hover:text-slate-300" />
+            </button>
+          )}
+          {showingForm && user && (
+            <button
+              className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+              onClick={() =>
+                navigate(
+                  `/${user.identities[0].identity_data.user_name}/favorites`
+                )
+              }
+            >
+              <StarIcon className="w-8 text-slate-800 hover:text-slate-300" />
+            </button>
           )}
           <button
-            className="flex justify-center border-2 w-8 h-8 p-1 my-2 bg-slate-200 rounded-md items-center"
+            className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
             onClick={() => setShowingAuthModal(!showingAuthModal)}
           >
             <UserCircleIcon className="w-8 text-slate-800 hover:text-slate-300" />
           </button>
+
           {showingAuthModal && (
             <Auth
               usernames={usernames}
@@ -133,55 +162,42 @@ export default function TopBar({
           )}
         </div>
       </div>
-      {error && (
-        <Notification color={"red"} message={"Error fetching user data"} />
-      )}
-      {userNotFound && (
-        <Notification color={"red"} message={"User not found."} />
-      )}
-      {userAlreadyAdded && (
-        <Notification color={"red"} message={"User already added to list."} />
-      )}
-      {maxUsersReached && (
-        <Notification
-          color={"red"}
-          message={"You can only compare 8 users at a time."}
-        />
-      )}
-      {userAdded && (
-        <Notification color={"green"} message={"User added to list."} />
-      )}
+      <Notifications
+        error={error}
+        userNotFound={userNotFound}
+        userAlreadyAdded={userAlreadyAdded}
+        maxUsersReached={maxUsersReached}
+        userAdded={userAdded}
+      />
       {showingInfo && (
-        <div>
-          <div className="fixed w-full top-24 sm:top-16 bg-white drop-shadow-lg text-center">
-            <p className="text-center font-bold mx-auto mt-4">
-              What is Dev-Compare?
-            </p>
-            <p className="text-center w-5/6 mx-auto mb-2">
-              Dev-Compare is a tool to compare and connect GitHub users.
-            </p>
-            <p className="text-center font-bold mx-auto mt-2">
-              How to use Dev-Compare?
-            </p>
-            <p className="text-center w-5/6 mx-auto">
-              Search any GitHub user by their login name and add them to the
-              list to compare them. A user's "connections" are a shortened list
-              of their followers and following combined. The design choice
-              behind this was to find other developers that are closely
-              connected to you in some way, similar to LinkedIn, to allow for
-              easier networking and collaboration. For any user that has an
-              email connected to their account, they will have an email button
-              included in the top-right corner to reach out.
-            </p>
-            <button
-              className="text-red-500 m-4"
-              onClick={() => setShowingInfo(false)}
-            >
-              Close
-            </button>
-          </div>
+        <div className="fixed w-full top-24 sm:top-16 bg-white drop-shadow-lg text-center">
+          <p className="text-center font-bold mx-auto mt-4">
+            What is devconnect?
+          </p>
+          <p className="text-center w-5/6 mx-auto mb-2">
+            Devconnect is a tool to compare and connect GitHub users.
+          </p>
+          <p className="text-center font-bold mx-auto mt-2">
+            How to use devconnect?
+          </p>
+          <p className="text-center w-5/6 mx-auto">
+            Search any GitHub user by their login name and add them to the list
+            to compare them. A user's "connections" are a shortened list of
+            their followers and following combined. The design choice behind
+            this was to find other developers that are closely connected to you
+            in some way, similar to LinkedIn, to allow for easier networking and
+            collaboration. For any user that has an email connected to their
+            account, they will have an email button included in the top-right
+            corner to reach out.
+          </p>
+          <button
+            className="text-red-500 m-4"
+            onClick={() => setShowingInfo(false)}
+          >
+            Close
+          </button>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -13,19 +13,12 @@ export default function Auth({
 
   const { user, signOut, signInWithGitHub } = useAuth();
 
-  useEffect(() => {
-      console.log(user);
-  }, [user]);
-
   const handleGitHubLogin = async () => {
     try {
       setShowingAuthModal(false);
       setLoading(true);
       const { error } = await signInWithGitHub();
       if (error) throw error;
-      console.log(user);
-      if (user) {
-      }
     } catch (error) {
       alert(error.error_description || error.message);
     } finally {
@@ -46,9 +39,9 @@ export default function Auth({
   };
 
   return (
-    <div className="fixed top-0 right-0 mt-16">
-      <div className="bg-white shadow-lg rounded-lg px-4 py-3">
-        <div className="flex justify-center text-center w-64">
+    <div className="fixed right-0 top-24 sm:top-16">
+      <div className="bg-slate-100 shadow-lg rounded-md p-2">
+        <div className="flex justify-center text-center w-48">
           {!user && (
             <button
               className="mr-2 px-10 h-8 bg-gray-600 text-gray-300 rounded-md focus:border-4 border-blue-300 flex flex-row items-center justify-between"
@@ -60,7 +53,7 @@ export default function Auth({
             </button>
           )}
           {user && user.identities && (
-            <div className="flex flex-col justify-center items-center p-2">
+            <div className="flex flex-col justify-between items-center p-2">
                 <div className="flex flex-row my-2">
                     <img
                         src={user.identities[0].identity_data.avatar_url}
@@ -68,7 +61,7 @@ export default function Auth({
                         width="50"
                         className="rounded-full"
                     />
-                    <div className="flex flex-col">
+                    <div className="flex flex-col ml-2">
                         <p className="font-bold ">{user.identities[0].identity_data.user_name}</p>
                         <p>{user.identities[0].identity_data.name}</p>
                     </div>

@@ -1,8 +1,8 @@
-# How to Run dev-compare
+# How to Run devconnect
 
 1. Clone the repo locally
 
-2. Add a `.env` file in `/dev-compare` with the following entry:
+2. Add a `.env` file in `/devconnect` with the following entry:
 
 ```
 REACT_APP_GH_TOKEN="YOUR_TOKEN_HERE"
@@ -15,7 +15,7 @@ _Follow the steps [here](https://docs.github.com/en/enterprise-server@3.4/authen
 3. Install dependencies
 
 ```
-$ cd dev-compare && npm install
+$ cd devconnect && npm install
 ```
 
 4. Run the app

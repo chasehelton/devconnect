@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "urql";
-import { MailIcon, XIcon } from '@heroicons/react/solid';
 import { useAuth } from "../contexts/AuthProvider.js";
+import UserIcons from "./UserIcons.js";
+import { supabase } from "../supabase.js";
 
 export default function UserHeader({
   idx,
@@ -49,28 +51,15 @@ export default function UserHeader({
                 </a>
                 <div className="flex flex-col">
                   <a href={data.user.url} target="_blank" rel="noreferrer">
-                    <p className="font-bold text-blue-500 hover:text-blue-300">{data.user.login}</p>
+                    <p className="font-bold text-blue-500 hover:text-blue-300">
+                      {data.user.login}
+                    </p>
                   </a>
                   <p>{data.user.name}</p>
                 </div>
               </div>
             </div>
-            <div>
-              {data.user.email && <button
-                onClick={() => window.location = "mailto:" + data.user.email}
-              >
-                <MailIcon className="w-8 text-slate-800 hover:text-slate-300" />
-              </button>}
-              <button
-                onClick={() => {
-                  const temp = [...usernames];
-                  temp.splice(idx, 1);
-                  setUsernames(temp);
-                }}
-              >
-                <XIcon className="w-8 text-slate-800 hover:text-slate-300" />
-              </button>
-            </div>
+            <UserIcons user={user} data={data} idx={idx} username={username} usernames={usernames} setUsernames={setUsernames} />
           </div>
           <div className="flex flex-row justify-around">
             <button
