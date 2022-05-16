@@ -9,7 +9,7 @@ export default function App() {
         path="/"
         element={<Home page={"UserList"} />}
       />
-      <Route path="/:username/messages" element={<Home page={"Messages"} />} />
+      {/* <Route path="/:username/messages" element={<Home page={"Messages"} />} /> */}
       <Route path="*" element={<div>Page Not Found</div>} />
     </Routes>
   );
