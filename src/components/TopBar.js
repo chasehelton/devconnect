@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   HomeIcon,
-  ChatIcon,
+  // ChatIcon,
   InformationCircleIcon,
   PlusIcon,
   UserCircleIcon,
