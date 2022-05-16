@@ -1,6 +1,7 @@
 import { useQuery } from "urql";
 import { useAuth } from "../contexts/AuthProvider.js";
 import UserIcons from "./UserIcons.js";
+import { GET_BASIC_USER } from "../graphql/queries.js";
 
 export default function UserHeader({
   idx,
@@ -11,24 +12,13 @@ export default function UserHeader({
   setSelectedHeader,
 }) {
   const { user } = useAuth();
+  const variables = { username: username };
   const [result] = useQuery({
-    query: `
-        query {
-          user(login: "${username}") {
-            avatarUrl
-            login
-            email
-            name
-            url
-          }
-        }
-      `,
+    query: GET_BASIC_USER,
+    variables,
   });
   const { data, fetching, error } = result;
-  if (error) {
-    alert(error.message);
-    return null;
-  }
+  if (error) return null;
   if (fetching) return <p>Loading...</p>;
 
   return (
@@ -56,9 +46,16 @@ export default function UserHeader({
                 </div>
               </div>
             </div>
-            <UserIcons user={user} data={data} idx={idx} username={username} usernames={usernames} setUsernames={setUsernames} />
+            <UserIcons
+              user={user}
+              data={data}
+              idx={idx}
+              username={username}
+              usernames={usernames}
+              setUsernames={setUsernames}
+            />
           </div>
-          <div className="flex flex-row justify-around">
+          {!fetching && (<div className="flex flex-row justify-around">
             <button
               className={`${
                 selectedHeader === "Social"
@@ -79,7 +76,7 @@ export default function UserHeader({
             >
               Code
             </button>
-          </div>
+          </div>)}
         </div>
       )}
     </>

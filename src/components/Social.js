@@ -1,53 +1,16 @@
 import React from "react";
 import { useQuery } from "urql";
+import { GET_USER_SOCIAL } from "../graphql/queries";
 
-export default function Social({
-  username,
-  usernames,
-  addUserToList
-}) {
+export default function Social({ username, usernames, addUserToList }) {
+  const variables = { username: username };
   const [result] = useQuery({
-    query: `
-    query {
-      user(login: "${username}") {
-        avatarUrl
-        name
-        login
-        bio
-        company
-        location
-        email
-        websiteUrl
-        followers(first: 10) {
-          edges {
-            node {
-              url
-              name
-              login
-            }
-          }
-          totalCount
-        }
-        following(first: 10){
-          edges{
-            node{
-              url
-              name
-              login
-            }
-          }
-          totalCount
-        }
-      }
-    }
-  `,
+    query: GET_USER_SOCIAL,
+    variables,
   });
   const { data, fetching, error } = result;
 
-  if (error) {
-    alert(error.message);
-    return null;
-  }
+  if (error) return null;
   if (fetching) return <p>Loading...</p>;
 
   let connections = [];

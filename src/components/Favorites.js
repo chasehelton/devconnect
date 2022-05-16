@@ -32,7 +32,7 @@ export default function Favorites({ usernames, addUserToList }) {
   }, []);
 
   return (
-    <div className="fixed right-1 top-24 sm:top-16">
+    <div className="fixed right-1 top-20 sm:top-16">
       <div className="bg-slate-100 shadow-lg rounded-md p-2">
         <div className="flex flex-col justify-start w-64 h-64 overflow-scroll">
           {/* {favorites.length > 0 && ( */}
