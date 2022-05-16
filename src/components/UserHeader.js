@@ -7,7 +7,6 @@ export default function UserHeader({
   username,
   usernames,
   setUsernames,
-  userScore,
   selectedHeader,
   setSelectedHeader,
 }) {

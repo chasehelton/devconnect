@@ -4,9 +4,7 @@ import { useQuery } from "urql";
 export default function Social({
   username,
   usernames,
-  setUsernames,
-  setMaxUsersReached,
-  setUserAlreadyAdded,
+  addUserToList
 }) {
   const [result] = useQuery({
     query: `
@@ -133,21 +131,7 @@ export default function Social({
                           ? `font-bold text-blue-600`
                           : `text-blue-500`
                       }
-                      onClick={() => {
-                        if (usernames.length === 8) setMaxUsersReached(true);
-                        else if (usernames.includes(connection.login))
-                          setUserAlreadyAdded(true);
-                        else {
-                          setUsernames((usernames) => [
-                            ...usernames,
-                            connection.login,
-                          ]);
-                        }
-                        setTimeout(() => {
-                          setUserAlreadyAdded(false);
-                          setMaxUsersReached(false);
-                        }, 2000);
-                      }}
+                      onClick={() => addUserToList(connection.login)}
                     >
                       {connection.name} ({connection.login})
                     </button>
