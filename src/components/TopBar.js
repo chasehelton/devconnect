@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
+  HomeIcon,
   ChatIcon,
   InformationCircleIcon,
   PlusIcon,
@@ -8,6 +9,7 @@ import {
   StarIcon,
 } from "@heroicons/react/solid";
 import Auth from "./Auth.js";
+import Favorites from "./Favorites.js";
 import Notifications from "./Notifications.js";
 import { useAuth } from "../contexts/AuthProvider.js";
 
@@ -22,15 +24,43 @@ export default function TopBar({
   const [userAdded, setUserAdded] = useState(false);
   const [error, setError] = useState(false);
   const [userNotFound, setUserNotFound] = useState(false);
-  const [showingAuthModal, setShowingAuthModal] = useState(true);
+  const [showingAuthModal, setShowingAuthModal] = useState(false);
+  const [showingFavoritesModal, setShowingFavoritesModal] = useState(false);
   const [showingInfo, setShowingInfo] = useState(false);
   const [showingForm, setShowingForm] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setShowingForm(user && usernames.length < 8 && usernames.length >= 0);
   }, [user, usernames]);
+
+  const handleAddUserViaForm = async (e) => {
+    e.preventDefault();
+    setShowingInfo(false);
+    fetch(`https://api.github.com/users/${e.target.username.value}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === "Not Found") setUserNotFound(true);
+        else addUserToList(e.target.elements.username.value);
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(true);
+        setTimeout(() => {
+          setError(false);
+        }, 2000);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setUserNotFound(false);
+          setUserAlreadyAdded(false);
+          setUserAdded(false);
+        }, 2000);
+        e.target.elements.username.value = "";
+      });
+  };
 
   const addUserToList = (username) => {
     if (usernames.includes(username)) {
@@ -41,6 +71,7 @@ export default function TopBar({
         setUsernames((usernames) => [...usernames, username]);
       setTimeout(() => setUserAdded(false), 2000);
     }
+    setTimeout(() => setUserAlreadyAdded(false), 2000);
   };
 
   const removeUserFromList = (idx) => {
@@ -72,38 +103,8 @@ export default function TopBar({
           {showingForm && page === "UserList" && (
             <form
               className="flex flex-row items-center"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setShowingInfo(false);
-                fetch(`https://api.github.com/users/${e.target.username.value}`)
-                  .then((res) => res.json())
-                  .then((data) => {
-                    if (data.message === "Not Found") setUserNotFound(true);
-                    else addUserToList(e.target.elements.username.value);
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                    setError(true);
-                    setTimeout(() => {
-                      setError(false);
-                    }, 2000);
-                  })
-                  .finally(() => {
-                    setTimeout(() => {
-                      setUserNotFound(false);
-                      setUserAlreadyAdded(false);
-                      setUserAdded(false);
-                    }, 2000);
-                    e.target.elements.username.value = "";
-                  });
-              }}
+              onSubmit={(e) => handleAddUserViaForm(e)}
             >
-              <button
-                className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
-                type="submit"
-              >
-                <PlusIcon className="w-8 text-slate-800 hover:text-slate-400" />
-              </button>
               <input
                 className="w-48 h-8 sm:w-64 mx-2 p-1 rounded-md border-2"
                 type="text"
@@ -111,6 +112,12 @@ export default function TopBar({
                 required
                 placeholder="GitHub Username"
               />
+              <button
+                className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+                type="submit"
+              >
+                <PlusIcon className="w-8 text-slate-800 hover:text-slate-400" />
+              </button>
             </form>
           )}
           {!showingForm && user && (
@@ -120,6 +127,25 @@ export default function TopBar({
           )}
           {!showingForm && !user && (
             <p className="italic mr-2">Please sign into GitHub.</p>
+          )}
+          {location.pathname.includes("messages") && (
+            <button
+              className="flex sm:hidden justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+              onClick={() => navigate("/")}
+            >
+              <HomeIcon className="w-8 text-slate-800 hover:text-slate-300" />
+            </button>
+          )}
+          {showingForm && user && !location.pathname.includes("messages") && (
+            <button
+              className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+              onClick={() => {
+                setShowingAuthModal(false);
+                setShowingFavoritesModal(!showingFavoritesModal);
+              }}
+            >
+              <StarIcon className="w-8 text-slate-800 hover:text-slate-300" />
+            </button>
           )}
           {showingForm && user && (
             <button
@@ -133,24 +159,18 @@ export default function TopBar({
               <ChatIcon className="w-8 text-slate-800 hover:text-slate-300" />
             </button>
           )}
-          {showingForm && user && (
-            <button
-              className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
-              onClick={() =>
-                navigate(
-                  `/${user.identities[0].identity_data.user_name}/favorites`
-                )
-              }
-            >
-              <StarIcon className="w-8 text-slate-800 hover:text-slate-300" />
-            </button>
-          )}
+
           <button
             className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
-            onClick={() => setShowingAuthModal(!showingAuthModal)}
+            onClick={() => {
+              setShowingFavoritesModal(false);
+              setShowingAuthModal(!showingAuthModal);
+            }}
           >
             <UserCircleIcon className="w-8 text-slate-800 hover:text-slate-300" />
           </button>
+
+          {showingFavoritesModal && <Favorites addUserToList={addUserToList} />}
 
           {showingAuthModal && (
             <Auth
@@ -175,7 +195,7 @@ export default function TopBar({
             What is devconnect?
           </p>
           <p className="text-center w-5/6 mx-auto mb-2">
-            Devconnect is a tool to compare and connect GitHub users.
+            Devconnect is an app made to connect GitHub users.
           </p>
           <p className="text-center font-bold mx-auto mt-2">
             How to use devconnect?

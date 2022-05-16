@@ -108,7 +108,7 @@ export default function Social({
                 {data.user.websiteUrl && (
                   <li className="pl-2">
                     <a
-                      href={`https://${data.user.websiteUrl}`}
+                      href={`${data.user.websiteUrl}`}
                       target="_blank"
                       rel="noreferrer"
                     >
