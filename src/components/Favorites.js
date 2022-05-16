@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "urql";
 
 import { supabase } from "../supabase.js";
 import { useAuth } from "../contexts/AuthProvider.js";
@@ -28,6 +27,7 @@ export default function Favorites({ addUserToList }) {
   useEffect(() => {
     setLoading(true);
     getAllFavoritesForUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

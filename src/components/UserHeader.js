@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { useQuery } from "urql";
 import { useAuth } from "../contexts/AuthProvider.js";
 import UserIcons from "./UserIcons.js";
-import { supabase } from "../supabase.js";
 
 export default function UserHeader({
   idx,

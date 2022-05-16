@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import {
-  ChatAltIcon,
-  MailIcon,
+  // ChatAltIcon,
+  // MailIcon,
   XIcon,
   StarIcon,
-  ArrowUpIcon,
+  // ArrowUpIcon,
 } from "@heroicons/react/solid";
 import { supabase } from "../supabase.js";
 
@@ -68,6 +68,7 @@ export default function UserIcons({
 
   useEffect(() => {
     getUserFavorite();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

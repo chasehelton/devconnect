@@ -23,6 +23,7 @@ export default function AuthProvider({ children }) {
     return () => {
       listener?.unsubscribe();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Will be passed down to Signup, Login and Dashboard components
