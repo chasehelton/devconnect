@@ -3,7 +3,7 @@ import User from "./User.js";
 export default function UserList({ usernames, setUsernames, setMaxUsersReached, setUserAlreadyAdded }) {
   document.title = "devconnect | Home";
   return (
-    <div className="flex flex-row flex-wrap justify-center max-w-7xl sm:mx-auto">
+    <div className="flex flex-row flex-wrap justify-center sm:max-w-7xl sm:mx-auto">
       {usernames.length > 0 && usernames.map((username, idx) => (
         <User
           key={username}

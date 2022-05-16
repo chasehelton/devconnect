@@ -130,8 +130,12 @@ export default function TopBar({
           )}
           {location.pathname.includes("messages") && (
             <button
-              className="flex sm:hidden justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
-              onClick={() => navigate("/")}
+              className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
+              onClick={() => {
+                setShowingAuthModal(false);
+                setShowingFavoritesModal(false);
+                navigate("/");
+              }}
             >
               <HomeIcon className="w-8 text-slate-800 hover:text-slate-300" />
             </button>
@@ -150,11 +154,13 @@ export default function TopBar({
           {showingForm && user && (
             <button
               className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
-              onClick={() =>
+              onClick={() => {
+                setShowingAuthModal(false);
+                setShowingFavoritesModal(false);
                 navigate(
                   `/${user.identities[0].identity_data.user_name}/messages`
-                )
-              }
+                );
+              }}
             >
               <ChatIcon className="w-8 text-slate-800 hover:text-slate-300" />
             </button>

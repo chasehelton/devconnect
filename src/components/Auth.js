@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 // import { supabase } from "../supabase.js";
 import { useAuth } from "../contexts/AuthProvider.js";
 import octocat from "../octocat.png";
+import { supabase } from "../supabase.js";
 
 export default function Auth({
   usernames,

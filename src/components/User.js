@@ -14,7 +14,7 @@ export default function User({
   const [selectedHeader, setSelectedHeader] = useState("Social");
 
   return (
-    <div className="w-full max-w-full sm:w-96 sm:max-w-md px-2 sm:p-2 sm:m-2 sm:rounded-xl bg-white sm:shadow-xl border-b-4 sm:border-2 border-gray-400 sm:border-gray-200">
+    <div className="w-full sm:w-96 sm:max-w-md px-2 sm:p-2 sm:m-2 rounded-none sm:rounded-xl bg-white sm:shadow-xl border-b-4 sm:border-2 border-gray-400 sm:border-gray-200">
       <UserHeader
         idx={idx}
         username={username}

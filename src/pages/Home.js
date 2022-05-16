@@ -26,7 +26,7 @@ export default function Home({ page }) {
         userAlreadyAdded={userAlreadyAdded}
         setUserAlreadyAdded={setUserAlreadyAdded}
       />
-      <div className="flex flex-row flex-wrap justify-center max-w-7xl mx-auto mt-28 sm:mt-20">
+      <div className="mt-28 sm:mt-20">
         {page === "UserList" && (
           <UserList
             usernames={usernames}
