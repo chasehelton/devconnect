@@ -18,10 +18,13 @@ export default function TopBar({
   usernames,
   setUsernames,
   maxUsersReached,
+  setMaxUsersReached,
   userAlreadyAdded,
   setUserAlreadyAdded,
+  userAdded,
+  setUserAdded,
+  addUserToList
 }) {
-  const [userAdded, setUserAdded] = useState(false);
   const [error, setError] = useState(false);
   const [userNotFound, setUserNotFound] = useState(false);
   const [showingAuthModal, setShowingAuthModal] = useState(false);
@@ -60,18 +63,6 @@ export default function TopBar({
         }, 2000);
         e.target.elements.username.value = "";
       });
-  };
-
-  const addUserToList = (username) => {
-    if (usernames.includes(username)) {
-      setUserAlreadyAdded(true);
-    } else {
-      setUserAdded(true);
-      if (!usernames.includes(username))
-        setUsernames((usernames) => [...usernames, username]);
-      setTimeout(() => setUserAdded(false), 2000);
-    }
-    setTimeout(() => setUserAlreadyAdded(false), 2000);
   };
 
   const removeUserFromList = (idx) => {
@@ -140,7 +131,7 @@ export default function TopBar({
               <HomeIcon className="w-8 text-slate-800 hover:text-slate-300" />
             </button>
           )}
-          {showingForm && user && !location.pathname.includes("messages") && (
+          {user && !location.pathname.includes("messages") && (
             <button
               className="flex justify-center border-2 w-8 h-8 p-1 m-1 bg-slate-200 rounded-md items-center"
               onClick={() => {
@@ -176,7 +167,9 @@ export default function TopBar({
             <UserCircleIcon className="w-8 text-slate-800 hover:text-slate-300" />
           </button>
 
-          {showingFavoritesModal && <Favorites addUserToList={addUserToList} />}
+          {showingFavoritesModal && (
+            <Favorites usernames={usernames} addUserToList={addUserToList} />
+          )}
 
           {showingAuthModal && (
             <Auth

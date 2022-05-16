@@ -10,6 +10,7 @@ export default function User({
   setUsernames,
   setMaxUsersReached,
   setUserAlreadyAdded,
+  addUserToList
 }) {
   const [selectedHeader, setSelectedHeader] = useState("Social");
 
@@ -27,9 +28,7 @@ export default function User({
         <Social
           username={username}
           usernames={usernames}
-          setUsernames={setUsernames}
-          setMaxUsersReached={setMaxUsersReached}
-          setUserAlreadyAdded={setUserAlreadyAdded}
+          addUserToList={addUserToList}
         />
       )}
       {selectedHeader === "Code" && <Code username={username} />}

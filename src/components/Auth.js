@@ -40,7 +40,7 @@ export default function Auth({
   return (
     <div className="fixed right-0 top-24 sm:top-16">
       <div className="bg-slate-100 shadow-lg rounded-md p-2">
-        <div className="flex justify-center text-center w-48">
+        <div className={user ? 'flex justify-center text-center w-48' : 'flex justify-center text-center w-48'}>
           {!user && (
             <button
               className="mr-2 px-10 h-8 bg-gray-600 text-gray-300 rounded-md focus:border-4 border-blue-300 flex flex-row items-center justify-between"
@@ -66,7 +66,7 @@ export default function Auth({
                     </div>
                 </div>
               <button
-                className="mr-2 px-10 h-8 bg-gray-600 text-gray-300 rounded-md focus:border-4 border-blue-300 flex flex-row items-center justify-between"
+                className="mr-2 px-10 h-8 bg-gray-600 text-gray-300 rounded-md focus:border-4 border-blue-300 flex flex-row items-center justify-center"
                 onClick={() => handleSignOut()}
                 disabled={loading}
               >
